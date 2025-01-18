@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.USER_CHECKOUT_TOKEN }}
 
     - name: Build and push Docker image
       env:
@@ -23,7 +25,7 @@ jobs:
       run: |
         git config --global user.name 'songtomtom'
         git config --global user.email 'celvincolvumn@gmail.com'
-        git clone https://${{ secrets.USER_CHECKOUT_TOKEN }}@github.com/songtomtom/argocd-app-manifests.git
+        git clone https://songtomtom:${{ secrets.USER_CHECKOUT_TOKEN }}@github.com/songtomtom/argocd-app-manifests.git
         cd argocd-app-manifests
         sed -i 's|image: .*|image: songtomtom/python-server:${{ github.sha }}|' deployment.yaml
         git add deployment.yaml
