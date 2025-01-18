@@ -1,0 +1,31 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build and push Docker image
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        docker build -t songtomtom/python-server:${{ github.sha }} .
+        docker push songtomtom/python-server:${{ github.sha }}
+
+    - name: Update deployment manifest
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git clone https://github.com/songtomtom/argocd-app-manifests.git
+        cd argocd-app-manifests
+        sed -i 's|image: .*|image: songtomtom/python-server:${{ github.sha }}|' kubernetes/deployment.yaml
+        git add kubernetes/deployment.yaml
+        git commit -m "Update image to ${{ github.sha }}"
+        git push
