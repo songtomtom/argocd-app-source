@@ -25,7 +25,7 @@ jobs:
         git config --global user.email 'actions@github.com'
         git clone https://github.com/songtomtom/argocd-app-manifests.git
         cd argocd-app-manifests
-        sed -i 's|image: .*|image: songtomtom/python-server:${{ github.sha }}|' kubernetes/deployment.yaml
-        git add kubernetes/deployment.yaml
+        sed -i 's|image: .*|image: songtomtom/python-server:${{ github.sha }}|' deployment.yaml
+        git add deployment.yaml
         git commit -m "Update image to ${{ github.sha }}"
         git push
